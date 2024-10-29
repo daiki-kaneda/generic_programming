@@ -1,38 +1,67 @@
+// リストのリストに対して、内部のリスト構造を解消して連結する関数concat
+List<T> concat<T>(List<List<T>> lss){
+  return [
+    for(final ls in lss)
+    ...ls
+  ];
+}
+
 // リストの要素の順序を変えない部分リスト全体を返す
-Set<List<T>> subs<T>(List<T> ls){
+List<List<T>> subs<T>(List<T> ls){
   if(ls.isEmpty){
-    return {[]};
+    return [[]];
   }else{
     final (x,xs)=(ls.first,ls.getRange(1, ls.length).toList());
     final yss = subs<T>(xs);
-    return yss.union(yss.map((ys)=>[x,...ys]).toSet());
+    return yss..addAll(yss.map((ys)=>[x,...ys]).toList());
   }
 }
 
 // 要素aとリストlsを受け取って、lsにaをひとつ挿入したリスト全体を返す関数
+List<List<T>> interleave<T>(T t,List<T> ls){
+  if(ls.isEmpty){
+    return [[t]];
+  }else{
+    final (x,xs) = (ls.first,ls.getRange(1, ls.length).toList());
+    return [
+      [t,x,...xs],
+      ...interleave(t, xs).map(
+        (l)=>[x,...l]
+      )
+    ];
+  }
+}
 
-// -- 役に立つリストについての関数の定義
-// -- subs::リストの部分リストを返す,interleave::ある要素をリストに挿入して返す,perms::リストの要素に対する順列を返す
-// subs :: [a]->[[a]]
-// subs [] = [[]]
-// subs (x:xs) = yss ++ (map (x:) yss) where yss = subs xs
+// リストを受け取り、そのリストを空でない二つのリストに分割して組にしたもの全体を返す関数(順序は変えない)
+List<(List<T>,List<T>)> split<T>(List<T> ls){
+  if(ls.length<2){
+    return [];
+  }else{
+    final (x,xs)=(ls.first,ls.getRange(1, ls.length).toList());
+    return [
+      ([x],xs),
+      ...split(xs).map(
+        (t)=>([x,...t.$1],t.$2)
+      )
+    ];
+  }
+}
 
-// interleave :: a->[a]->[[a]]
-// interleave x [] = [[x]]
-// interleave x (y:ys) = (x:y:ys) : map (y:) (interleave x ys)
+// リストを受け取って、その要素を使った順列全体を返す。すなわち、要素を高々一つずつ選んだ組の順列全体を返す
+List<List<T>> choices<T>(List<T> ls){
+  return concat(subs(ls).map(
+    (l)=>perms(l)
+  ).toList());
+}
 
-// perms :: [a]->[[a]]
-// perms [] = [[]]
-// perms (x:xs) = concat (map (interleave x) (perms xs))
-
-// -- リストを受け取って、選択肢全てを返す(任意の部分リストをとって、その順列全体を求め、それらを連結したものを返す）関数choiceの定義
-// choices :: [a]->[[a]]
-// choices l = concat (map perms (subs l))
-
-
-
-// -- リストを受け取り、そのリストを空でない二つのリストに分割して組にしたもの全体を返す関数splitの定義(順序を変えずに)
-// split :: [a] -> [([a],[a])]
-// split [] =[]
-// split [_] =[]
-// split (x:xs) = ([x],xs):[((x:ls),rs)|(ls,rs)<-split xs]
+// リストを受け取って、その要素の順列全体のリストを返す関数
+List<List<T>> perms<T>(List<T> ls){
+  if(ls.isEmpty){
+    return [[]];
+  }else{
+    final (x,xs)=(ls.first,ls.getRange(1, ls.length).toList());
+    return concat (perms(xs).map(
+      (l)=>interleave(x, l)
+    ).toList());
+  }
+}

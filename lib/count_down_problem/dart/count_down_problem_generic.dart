@@ -47,4 +47,10 @@ class CountDownProblemGenericSolver<T> {
       r.$1
     ];
   }
+
+  Op<T> op(String name){
+    final op = ops.where((op)=>op.name==name).firstOrNull;
+    if(op==null)throw UnimplementedError();
+    return op;
+  }
 }

@@ -7,7 +7,7 @@ class CountDownProblemGenericSolver<T> {
   final Set<Op<T>> ops;
 
   // using Result and valid instead of Expr for efficiency
-  // utility
+
   // 左右のResult（式とその値の組）の間に演算子を入れた有効なResult全体を返す
   List<Result<T>> combine(Result<T> l, Result<T> r) {
     return ops

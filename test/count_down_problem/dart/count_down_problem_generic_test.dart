@@ -29,53 +29,53 @@ void main() {
             (
               App(mul, const Value(2),
                   App(solver.ops.first, const Value(3), const Value(4))),
-              -5
+              14
             ),
           ].toString());
     });
 
     test('results test', () {
       expect(
-          solver.results([1, 2, 3]).toString(),
+          solver.results([3, 2, 1]).toString(),
           [
             (
-              App(add, const Value(1),
-                  App(add, const Value(2), const Value(3))),
+              App(add, const Value(3),
+                  App(add, const Value(2), const Value(1))),
               6
             ),
             (
-              App(mul, const Value(1),
-                  App(add, const Value(2), const Value(3))),
-              5
-            ),
-            (
-              App(add, const Value(1),
-                  App(mul, const Value(2), const Value(3))),
-              7
-            ),
-            (
-              App(mul, const Value(1),
-                  App(mul, const Value(2), const Value(3))),
-              6
-            ),
-            (
-              App(add, App(add, const Value(1), const Value(2)),
-                  const Value(3)),
-              6
-            ),
-            (
-              App(mul, App(add, const Value(1), const Value(2)),
-                  const Value(3)),
+              App(mul, const Value(3),
+                  App(add, const Value(2), const Value(1))),
               9
             ),
             (
-              App(add, App(mul, const Value(1), const Value(2)),
-                  const Value(3)),
+              App(add, const Value(3),
+                  App(mul, const Value(2), const Value(1))),
               5
             ),
             (
-              App(mul, App(mul, const Value(1), const Value(2)),
-                  const Value(3)),
+              App(mul, const Value(3),
+                  App(mul, const Value(2), const Value(1))),
+              6
+            ),
+            (
+              App(add, App(add, const Value(3), const Value(2)),
+                  const Value(1)),
+              6
+            ),
+            (
+              App(mul, App(add, const Value(3), const Value(2)),
+                  const Value(1)),
+              5
+            ),
+            (
+              App(add, App(mul, const Value(3), const Value(2)),
+                  const Value(1)),
+              7
+            ),
+            (
+              App(mul, App(mul, const Value(3), const Value(2)),
+                  const Value(1)),
               6
             )
           ].toString());

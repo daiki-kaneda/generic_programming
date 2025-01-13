@@ -2,14 +2,15 @@ import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:generic_programming/count_down_problem/dart/utils.dart';
 
-typedef Result<T> = (Expr<T>,T);
-class Op<T>{
-  Op(this.name,this.apply,[this.valid = _defaultValid]);
-  final String name;
-  final T Function (T,T) apply;
-  final bool Function(T,T) valid;
+typedef Result<T> = (Expr<T>, T);
 
-  static bool _defaultValid(_,__){
+class Op<T> {
+  Op(this.name, this.apply, [this.valid = _defaultValid]);
+  final String name;
+  final T Function(T, T) apply;
+  final bool Function(T, T) valid;
+
+  static bool _defaultValid(_, __) {
     return true;
   }
 
@@ -19,92 +20,100 @@ class Op<T>{
   }
 
   @override
-  bool operator ==(Object other){
-    return other is Op<T> && other.name==name;
+  bool operator ==(Object other) {
+    return other is Op<T> && other.name == name;
   }
 
   @override
   int get hashCode => name.hashCode;
 }
 
-class Expr<T>{
+sealed class Expr<T> {
   const Expr();
 
-  static final exprTypeError = UnsupportedError('Expr must be Value or App');
+  //static final exprTypeError = UnsupportedError('Expr must be Value or App');
 
-  List<T> values(){
-    if(this is Value<T>){
-      return [(this as Value<T>).value];
-    }else if(this is App<T>){
-      final app = this as App<T>;
-      return app.l.values()+app.r.values();
-    }else{
-      throw exprTypeError;
+  List<T> values() {
+    switch (this) {
+      case Value<T>():
+        return [(this as Value<T>).value];
+      case App<T>():
+        {
+          final app = this as App<T>;
+          return app.l.values() + app.r.values();
+        }
     }
   }
 
-  T eval(){
-    if(this is Value<T>){
-      return (this as Value<T>).value;
-    }else if(this is App<T>){
-      final app = this as App<T>;
-      return app.op.apply(app.l.eval(),app.r.eval());
-    }else{
-      throw exprTypeError;
+  T eval() {
+    switch (this) {
+      case Value<T>():
+        return (this as Value<T>).value;
+      case App<T>():
+        {
+          final app = this as App<T>;
+          return app.op.apply(app.l.eval(), app.r.eval());
+        }
     }
   }
 
-  bool solution(List<T> ts,t){
-    return choices(ts).where((l)=>(const ListEquality()).equals(l, values())).isNotEmpty && 
-    eval()==t;
+  bool solution(List<T> ts, t) {
+    return choices(ts)
+            .where((l) => (const ListEquality()).equals(l, values()))
+            .isNotEmpty &&
+        eval() == t;
   }
 
   @override
   String toString() {
-    if(this is Value<T>){
-      return (this as Value).value.toString();
-    }else if(this is App<T>){
-      final app = this as App<T>;
-      final isLValue = app.l is Value;
-      final isRValue = app.r is Value;
-      final leftParenthesisOfL = isLValue ? '' :'(';
-      final rightParenthesisOfL = isLValue ? '' :')';
-      final leftParenthesisOfR = isRValue ? '' :'(';
-      final rightParenthesisOfR = isRValue ? '' :')';
+    switch (this) {
+      case Value<T>():
+        return (this as Value).value.toString();
+      case App<T>():
+        {
+          final app = this as App<T>;
+          final isLValue = app.l is Value;
+          final isRValue = app.r is Value;
+          final leftParenthesisOfL = isLValue ? '' : '(';
+          final rightParenthesisOfL = isLValue ? '' : ')';
+          final leftParenthesisOfR = isRValue ? '' : '(';
+          final rightParenthesisOfR = isRValue ? '' : ')';
 
-      return leftParenthesisOfL + app.l.toString() + rightParenthesisOfL + app.op.toString() + leftParenthesisOfR + app.r.toString() + rightParenthesisOfR;
-    }else{
-      throw exprTypeError;
+          return leftParenthesisOfL +
+              app.l.toString() +
+              rightParenthesisOfL +
+              app.op.toString() +
+              leftParenthesisOfR +
+              app.r.toString() +
+              rightParenthesisOfR;
+        }
     }
   }
 }
 
-class Value<T> extends Expr<T>{
+class Value<T> extends Expr<T> {
   const Value(this.value);
   final T value;
 
   @override
   bool operator ==(Object other) {
-    return other is Value<T> && other.value==value;
+    return other is Value<T> && other.value == value;
   }
 
   @override
   int get hashCode => value.hashCode;
 }
 
-class App<T> extends Expr<T>{
-  const App(this.op,this.l,this.r);
-  
+class App<T> extends Expr<T> {
+  const App(this.op, this.l, this.r);
+
   final Op<T> op;
   final Expr<T> l;
   final Expr<T> r;
 
   @override
   bool operator ==(Object other) {
-    return other is App<T> &&
-     other.op==op &&
-     other.l==l &&
-     other.r==r;
+    return other is App<T> && other.op == op && other.l == l && other.r == r;
   }
 
   @override
